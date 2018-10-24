@@ -14,8 +14,8 @@ defmodule Nerves.Ntp.Worker do
   def init(_args) do
     Logger.debug "Binary to use: #{@ntpd}"
     Logger.debug "Configured servers are: #{inspect @servers}"
-    Logger.debug ~s(Command to run: "#{ntp_cmd}")
-    ntpd = Port.open({:spawn, ntp_cmd}, [
+    Logger.debug ~s(Command to run: "#{ntp_cmd()}")
+    ntpd = Port.open({:spawn, ntp_cmd()}, [
         :exit_status,
         :use_stdio,
         :binary,
@@ -29,7 +29,7 @@ defmodule Nerves.Ntp.Worker do
     Logger.debug "ntpd exited with code: #{code}"
     # ntp exited so we will try to restart it after 10 sek
     # Port.close(state) // not required... as port is already closed
-    pause_and_die
+    pause_and_die()
   end
 
   def handle_info({_, {:data, {:eol, data}}}, port) do
@@ -39,7 +39,7 @@ defmodule Nerves.Ntp.Worker do
         {:noreply, port}
       :error -> 
         Port.close(port)
-        pause_and_die
+        pause_and_die()
     end
   end
 
